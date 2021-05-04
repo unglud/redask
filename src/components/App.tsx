@@ -10,11 +10,30 @@ interface AppProps {
   deleteTodo: typeof deleteTodo;
 }
 
-class _App extends Component<AppProps> {
+interface AppState {
+  fetching: boolean;
+}
+
+class _App extends Component<AppProps, AppState> {
+  constructor(props: AppProps) {
+    super(props);
+
+    this.state = { fetching: false };
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<AppProps>
+  ) {
+    if (!prevProps.todos.length && this.props.todos.length) {
+      this.setState({ fetching: false });
+    }
+  }
+
   render() {
     return (
       <div>
         <button onClick={this.onButtonClick}>Fetch</button>
+        {this.state.fetching ? 'LOADING...': ''}
         {this.renderList()}
       </div>
     );
@@ -31,6 +50,7 @@ class _App extends Component<AppProps> {
   }
 
   private onButtonClick = (): void => {
+    this.setState({ fetching: true });
     this.props.fetchTodos();
   };
 
